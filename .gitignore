@@ -1,0 +1,5 @@
+/build
+/test
+*.exe
+*.elf
+*.txt

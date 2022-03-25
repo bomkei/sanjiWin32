@@ -1,3 +1,4 @@
+
 TARGET	= sanji.exe
 
 TOPDIR	?= $(CURDIR)
@@ -8,11 +9,11 @@ TEST	= test
 
 DEFINES	= UNICODE
 
-COMMON_FLAGS	= -g -O2
-SFLAGS			= $(COMMON_FLAGS)
-CFLAGS			= $(SFLAGS) $(INCLUDES) $(foreach def,$(DEFINES),-D $(def))
-CXXFLAGS		= $(CFLAGS) -std=c++20 -Wno-switch
-LDFLAGS			= -Wl,--gc-sections -mwindows
+COMMON_FLAGS	:= -g -O2
+SFLAGS			:= $(COMMON_FLAGS)
+CFLAGS			:= $(SFLAGS) $(INCLUDES) $(foreach def,$(DEFINES),-D $(def))
+CXXFLAGS		:= $(CFLAGS) -std=c++20 -Wno-switch
+LDFLAGS			:= -Wl,--gc-sections -mwindows
 
 %.o: %.s
 	@echo $(notdir $<)
@@ -42,7 +43,15 @@ export OFILES	= \
 	$(CFILES:.c=.o) \
 	$(CXXFILES:.cc=.o)
 
+.PHONY: $(BUILD)
+
 all: $(BUILD)
+
+debug:
+	@rm -drf $(BUILD)
+	@rm -f $(TARGET)
+	@[ -d $(BUILD) ] || mkdir -p $(BUILD)
+	@$(MAKE) COMMON_FLAGS="-g -O0" --no-print-directory -C $(BUILD) -f $(TOPDIR)/Makefile
 
 $(BUILD):
 	@[ -d $@ ] || mkdir -p $@

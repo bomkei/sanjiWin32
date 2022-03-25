@@ -1,5 +1,7 @@
 /build
 /test
+test.*
+memo.*
 *.exe
 *.elf
 *.txt

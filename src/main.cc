@@ -1,13 +1,34 @@
+#include <iostream>
 #include "WinLib.h"
-#include "TimelineWindow.h"
 
-int Main(std::vector<std::wstring> const& args) {
-	using namespace Sanji;
-	using namespace WinLib;
+namespace Sanji {
+  class MyWindow : public WinLib::Window {
+  public:
+    using WinLib::Window::Window;
 
-	TimelineWindow tl_window{ L"my window", 500, 300 };
+    LRESULT CALLBACK window_proc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) override {
+      switch( msg ) {
+        case WM_CREATE: {
 
-	tl_window.show();
 
+          break;
+        }
 
+        case WM_DESTROY: {
+          PostQuitMessage(0);
+          break;
+        }
+      }
+
+      return 0;
+    }
+  };
+
+  int Main(std::vector<std::wstring> const& args) {
+    auto w = new MyWindow();
+
+    w->show();
+
+    return 0;
+  }
 }

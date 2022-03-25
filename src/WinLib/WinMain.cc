@@ -1,46 +1,45 @@
-#include <iostream>
+#include <thread>
 #include "WinLib.h"
-#include "WinLib/Exceptions/Exception.h"
-#include "debug.h"
 
-//static WNDCLASSEX wcex;
-static std::vector<std::wstring> args;
+using namespace WinLib;
 
-int Main(std::vector<std::wstring> const& args);
+namespace Sanji {
+  int Main(std::vector<std::wstring> const& args);
+}
 
-bool bAttachToConsole()
-{
-    if (!AttachConsole(ATTACH_PARENT_PROCESS))
-    {
-        if (GetLastError() != ERROR_ACCESS_DENIED) //already has a console
-        {
-            if (!AttachConsole(GetCurrentProcessId()))
-            {
-                DWORD dwLastError = GetLastError();
-                if (dwLastError != ERROR_ACCESS_DENIED) //already has a console
-                {
-                    return false;
-                }
-            }
-        }
+LRESULT CALLBACK g_wndproc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
+  auto& windowptr = Window::window_map[hwnd];
+
+  if( windowptr ) {
+    windowptr->window_proc(hwnd, msg, wp, lp);
+  }
+
+  switch( msg ) {
+    case WM_CREATE: {
+      if( !windowptr ) {
+        auto createstruct = (LPCREATESTRUCT)lp;
+        windowptr = (Window*)createstruct->lpCreateParams;
+      }
+
+      break;
     }
 
-    return true;
+    default: {
+      return DefWindowProc(hwnd, msg, wp, lp);
+    }
+  }
+
+  return 0;
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
-  using namespace WinLib;
-
-  HWND hwnd;
   MSG msg;
+  std::vector<std::wstring> args;
 
-
-
-/*
-  wcex = {
+  Window::wcex = {
     .cbSize = sizeof(WNDCLASSEX),
     .style = CS_HREDRAW | CS_VREDRAW,
-    .lpfnWndProc = global_wndproc,
+    .lpfnWndProc = g_wndproc,
     .cbClsExtra = 0,
     .cbWndExtra = 0,
     .hInstance = hInstance,
@@ -48,65 +47,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     .hCursor = nullptr,
     .hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH),
     .lpszMenuName = nullptr,
-    .lpszClassName = TEXT("yeah")
+    .lpszClassName = TEXT("WINDOW")
   };
 
-  if( !RegisterClassEx(&wcex) ) {
-    return -1;
-  }
-  */
-  /*
-  hwnd = CreateWindow(
-    TEXT("yeah"), TEXT("hello"),
-    WS_OVERLAPPEDWINDOW,
-    CW_USEDEFAULT, CW_USEDEFAULT,
-    400, 200,
-    nullptr, nullptr,
-    hInstance, nullptr
-  );
-
-  if( hwnd == nullptr ) {
-    std::cout << "no\n";
+  if( !RegisterClassEx(&Window::wcex) ) {
     return -1;
   }
 
-  ShowWindow(hwnd, SW_SHOW);
-*/
+  Sanji::Main(args);
 
-  try {
-    if( !bAttachToConsole() ) {
-      MessageBox(nullptr, TEXT("bAttachToConsole() was failed"), TEXT(""), MB_OK);
-    }
-
-    _msg("starting application");
-
-    Window::Initialize(hInstance);
-
-    //MessageBox(nullptr, TEXT("uo"), TEXT(""), MB_OK);
-
-    Main(args);
-
-    while( GetMessage(&msg, nullptr, 0, 0) ) {
-      TranslateMessage(&msg);
-      DispatchMessage(&msg);
-    }
-
-    return msg.wParam;
-  }
-  catch( WinLib::Exception const& e ) {
-    MessageBox(nullptr, e.what().c_str(), TEXT("exception has been occurred"), MB_OK);
-  }
-  catch( ... ) {
-    MessageBox(nullptr, TEXT("unhandled exception has been occurred"), TEXT("error"), MB_OK);
+  while( GetMessage(&msg, NULL, 0, 0) ) {
+    TranslateMessage(&msg);
+    DispatchMessage(&msg);
   }
 
-  MessageBox(nullptr, TEXT("aaa"), TEXT(""), MB_OK);
-
-  return -1;
-
-  // std::vector<std::wstring> args;
-
-  // TODO: make args
-
-  // return Main(args);
+  return msg.wParam;
 }

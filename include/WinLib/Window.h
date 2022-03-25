@@ -1,35 +1,20 @@
 #pragma once
 
-#include <memory>
+#include <map>
 
 namespace WinLib {
-  class WindowImpl;
   class Window {
-    /*
-    static std::wstring classname;
-
+  public:
     HWND hwnd;
 
-    std::wstring title;
-    int width;
-    int height;
+    static inline WNDCLASSEX wcex;
+    static inline std::map<HWND, Window*> window_map;
 
-    bool create_wnd(std::wstring title, int width, int height);
-*/
-  public:
+    virtual LRESULT CALLBACK window_proc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) = 0;
+
+    bool show() const;
+
+  protected:
     Window();
-    Window(std::wstring title);
-    Window(std::wstring title, int width, int height);
-    ~Window();
-
-    void show();
-    static Window* get_window(HWND hwnd);
-
-    virtual LRESULT CALLBACK wndproc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp);
-
-    static void Initialize(HINSTANCE hInstance);
-
-    std::unique_ptr<WindowImpl> impl;
-    //static std::map<HWND, Window*> wndmap;
   };
 }

@@ -23,12 +23,14 @@ namespace Sanji {
       return 0;
     }
   };
+}
 
-  int Main(std::vector<std::wstring> const& args) {
-    auto w = new MyWindow();
+int Main(std::vector<std::wstring> const& args) {
+  using namespace Sanji;
+  
+  auto w = new MyWindow();
 
-    w->show();
+  w->show();
 
-    return 0;
-  }
+  return 0;
 }

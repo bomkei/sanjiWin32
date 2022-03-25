@@ -3,9 +3,7 @@
 
 using namespace WinLib;
 
-namespace Sanji {
-  int Main(std::vector<std::wstring> const& args);
-}
+int Main(std::vector<std::wstring> const& args);
 
 LRESULT CALLBACK g_wndproc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
   auto& windowptr = Window::window_map[hwnd];
@@ -54,7 +52,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     return -1;
   }
 
-  Sanji::Main(args);
+  Main(args);
 
   while( GetMessage(&msg, NULL, 0, 0) ) {
     TranslateMessage(&msg);
